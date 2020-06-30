@@ -71,7 +71,7 @@ class Rouge155(object):
 
     """
 
-    def __init__(self, rouge_dir=None, rouge_args=None, log_level=None):
+    def __init__(self, rouge_dir=None, rouge_args=None, log_level=None, stemming=False):
         """
         Create a Rouge155 object.
 
@@ -92,6 +92,7 @@ class Rouge155(object):
         self.args = self.__clean_rouge_args(rouge_args)
         self._system_filename_pattern = None
         self._model_filename_pattern = None
+        self.stemming = stemming
 
     def save_home_dir(self):
         config = ConfigParser()
@@ -530,7 +531,7 @@ class Rouge155(object):
                 ]
             options = list(map(str, options))
 
-        options = self.__add_config_option(options)
+        options = self.__add_config_option(options, stemming=self.stemming)
         return options
 
     def __create_dir_property(self, dir_name, docstring):
@@ -581,8 +582,9 @@ class Rouge155(object):
         else:
             return rouge_args
 
-    def __add_config_option(self, options):
-        return options + ['-m'] + [self._config_file]
+    def __add_config_option(self, options, stemming=False):
+        stemming_opt = ['-m'] if stemming else []
+        return options + stemming_opt + [self._config_file]
 
     def __get_config_path(self):
         if platform.system() == "Windows":
